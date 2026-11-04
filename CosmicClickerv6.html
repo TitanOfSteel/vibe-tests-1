@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cosmic Clicker v6</title>
+<style>
+:root{--acc:#72f5ff;--bg:#050816;--pn:#0d1530;--ln:#1e2a52;--tx:#e8eeff;--mu:#8a97c4;--hl:color-mix(in srgb,var(--acc) 42%,#1e2a52);color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#16234f,var(--bg) 62%);color:var(--tx);font:15px/1.4 system-ui,sans-serif;min-height:100vh}
+#stars{position:fixed;inset:0;z-index:-1;opacity:.6;background-size:210px 170px;background-image:radial-gradient(1px 1px at 20px 30px,#fff9,transparent),radial-gradient(1px 1px at 95px 125px,#fff7,transparent),radial-gradient(1.5px 1.5px at 165px 60px,#fffa,transparent)}
+header{display:flex;gap:28px;align-items:baseline;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--hl)}
+header b{letter-spacing:.18em;color:var(--acc)}.big{font-size:28px;font-weight:700}.mut{color:var(--mu);font-size:12px}
+nav{display:flex;gap:6px;padding:10px 20px;overflow-x:auto}
+button{font:inherit;color:var(--tx)}
+nav button,.btn{background:var(--pn);border:1px solid var(--hl);border-radius:8px;padding:8px 14px;cursor:pointer}
+nav button.on,.btn:hover:not(:disabled),.btn.on{border-color:var(--acc);box-shadow:0 0 12px -4px var(--acc)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:focus-visible,nav button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+main{max-width:980px;margin:0 auto;padding:6px 20px 60px}.pg{display:none}.pg.on{display:block}
+#scene{position:relative;width:min(340px,80vw);height:min(400px,56vh);margin:18px auto;cursor:pointer;user-select:none;touch-action:manipulation}
+#aura{position:absolute;inset:-12%;background:radial-gradient(circle,var(--acc),var(--acc2,var(--acc)) 38%,transparent 64%);opacity:.32;animation:br 4s ease-in-out infinite}
+#crystal{position:absolute;inset:6%;width:88%;height:88%;z-index:2;filter:drop-shadow(0 0 16px var(--acc))}
+#crystal:active{transform:scale(.95)}
+.crystal-float{transform-origin:center;animation:float 4.5s ease-in-out infinite}.crystal-shine{animation:shine 3.5s ease-in-out infinite}
+#crystal.shat .crystal-float{animation:none}
+#crystal.shat path{transform-box:fill-box;transform-origin:center;animation:sh 1.2s ease-in forwards}
+#crystal path:nth-child(odd){--dx:-70px;--dy:-60px;--r:-50deg}#crystal path:nth-child(even){--dx:70px;--dy:60px;--r:55deg}#crystal path:nth-child(3n){--dy:-95px}
+@keyframes sh{40%{transform:translate(var(--dx),var(--dy)) rotate(var(--r))}75%{opacity:0}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+#crystal.re{animation:ri .5s ease-out}@keyframes ri{from{opacity:0;transform:scale(.8)}}
+@keyframes float{50%{transform:translateY(-6px) rotate(1deg)}}@keyframes shine{50%{opacity:1}}
+@keyframes br{50%{opacity:.5;transform:scale(1.06)}}@keyframes fl{50%{transform:translateY(-8px)}}
+#rings{position:absolute;inset:0;pointer-events:none;z-index:1}
+.ring{position:absolute;left:50%;top:50%;border:1px solid var(--c);border-radius:50%;box-shadow:0 0 8px var(--c);opacity:.85}
+.sp{position:absolute;inset:0;border-radius:50%;animation:spin linear infinite}
+.dot{position:absolute;left:50%;top:-5px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--d);box-shadow:0 0 12px var(--d)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pop{position:fixed;z-index:50;pointer-events:none;font-weight:700;color:var(--acc);text-shadow:0 0 8px var(--acc);animation:pp .9s ease-out forwards;transform:translateX(-50%)}
+@keyframes pp{to{transform:translate(-50%,-64px);opacity:0}}
+.stats{display:flex;justify-content:center;gap:34px;flex-wrap:wrap;text-align:center}
+.card{display:flex;gap:14px;align-items:center;background:var(--pn);border:1px solid var(--hl);border-radius:10px;padding:10px 14px;margin:8px 0}
+.ic{width:84px;flex:none}.ic svg{width:100%;height:auto;display:block}.ic.sil svg{filter:brightness(0) drop-shadow(0 0 1.5px rgba(160,190,255,.6))}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:14px}
+.panel{background:var(--pn);border:1px solid var(--hl);border-radius:10px;padding:14px}
+.panel h3{margin:16px 0 6px;font-size:14px}.panel h3:first-child{margin-top:0}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.tile{background:#0a1026;border-radius:8px;padding:10px}.tile b{display:block;font-size:18px}
+.mix{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#0a1026}.mix i{display:block;height:100%}
+.ach{font:inherit;text-align:left;cursor:pointer;background:#070b1a;border:1px solid color-mix(in srgb,var(--acc) 22%,#0a0f22);border-radius:8px;padding:12px;color:#3b4670;font-size:13px}
+.ach.u{background:var(--pn);color:var(--tx);border-color:var(--acc)}.ach.s{outline:2px solid var(--acc);outline-offset:1px}
+.card.lock{opacity:.7;border-style:dashed}.gr{flex:1;min-width:0}.ac{display:flex;gap:6px}
+.bar{height:8px;background:#0a1026;border-radius:5px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--acc);width:0}
+.pulse{animation:pu 1.4s ease-in-out infinite;border-color:var(--acc)}@keyframes pu{50%{box-shadow:0 0 18px var(--acc)}}
+.qs{display:flex;gap:6px;margin:8px 0}
+#gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+#aur{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+#map{position:fixed;inset:0;z-index:40;background:#03050f;display:flex;flex-direction:column}#map[hidden]{display:none}
+#mh,#pd{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 16px;border-color:var(--hl);border-style:solid;border-width:0 0 1px}#pd{border-width:1px 0 0}
+#mv{flex:1;overflow:hidden;position:relative;cursor:grab;touch-action:none;user-select:none}#mv.dr{cursor:grabbing}
+#world{position:absolute;left:0;top:0;width:2650px;height:1700px;will-change:transform;background-image:radial-gradient(1.5px 1.5px at 30px 40px,#fffa,transparent),radial-gradient(1px 1px at 130px 110px,#fff8,transparent),radial-gradient(2px 2px at 220px 190px,#fff9,transparent);background-size:260px 230px}
+.node{position:absolute;transform:translate(-50%,-50%);background:none;border:0;padding:0;cursor:pointer;color:var(--tx);text-align:center}
+.node span{display:block;font-size:12px;margin-top:8px;color:var(--mu)}.node.sel span{color:var(--acc)}
+.node.cl .pm{box-shadow:0 0 0 3px var(--acc),0 0 26px var(--acc)}.node.af .pm{animation:pu 1.4s ease-in-out infinite}
+.pm{--g:radial-gradient(circle at 32% 30%,var(--b),var(--a) 62%,#000 128%);width:var(--s);height:var(--s);border-radius:50%;position:relative;margin:0 auto;background:var(--g);box-shadow:0 0 20px -6px var(--b)}
+.p0{background:repeating-linear-gradient(172deg,#0000 0 8%,#0004 8% 14%,#fff2 14% 18%),var(--g)}
+.p1{background:repeating-linear-gradient(176deg,#0000 0 12%,#0003 12% 20%),var(--g)}.p1::after{content:"";position:absolute;left:-32%;right:-32%;top:38%;height:24%;border:3px solid var(--b);border-radius:50%;transform:rotate(-16deg);opacity:.8}
+.p2{background:radial-gradient(circle at 30% 60%,#0005 0 9%,transparent 10%),radial-gradient(circle at 62% 34%,#0004 0 12%,transparent 13%),radial-gradient(circle at 70% 72%,#0004 0 7%,transparent 8%),var(--g)}
+.p3{background:conic-gradient(from 20deg at 45% 55%,#fff0,#fff6,#fff0 30%,#fff5,#fff0 60%,#fff6,#fff0),var(--g)}
+.p4{background:linear-gradient(115deg,transparent 40%,#ff7a2f 41% 43%,transparent 44%),linear-gradient(62deg,transparent 55%,#ff7a2f 56% 58%,transparent 59%),linear-gradient(170deg,transparent 30%,#ffb45c 31% 32%,transparent 33%),var(--g)}
+.p5{background:radial-gradient(ellipse at 50% 0,#fff 0 22%,transparent 46%),radial-gradient(ellipse at 50% 100%,#fff 0 18%,transparent 40%),var(--g)}
+.p6{border-radius:0;clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);background:conic-gradient(var(--b),var(--a),var(--b),var(--a),var(--b),var(--a),var(--b))}
+.p7{background:radial-gradient(ellipse 24% 15% at 62% 58%,#fff9 0 40%,#a004 41% 60%,transparent 62%),repeating-linear-gradient(174deg,#0000 0 10%,#0003 10% 18%),var(--g)}
+.p8{background:linear-gradient(95deg,transparent 45%,#000c 64%),var(--g)}
+.p9::before{content:"";position:absolute;right:-28%;bottom:-8%;width:36%;height:36%;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--b),var(--a))}
+#ringsF{position:absolute;inset:0;pointer-events:none;z-index:3}#world{transform-origin:0 0}
+.pm.fog{filter:brightness(0) drop-shadow(0 0 2px rgba(160,190,255,.5));animation:none!important;box-shadow:none}
+@keyframes gl{50%{filter:drop-shadow(0 0 7px var(--acc))}}
+.ic:not(.sil) svg{animation:gl 5s ease-in-out infinite}#blds .card:nth-child(3n+2) .ic svg{animation-delay:-1.7s}#blds .card:nth-child(3n) .ic svg{animation-delay:-3.3s}
+.lq .ring{box-shadow:none}.lq #crystal{filter:none}.lq #aura{animation:none}.lq .ic svg{animation:none!important}
+.card,.panel,.tile,.bar,.mix,#gr{transition:border-color .2s,box-shadow .2s}
+.card,.panel{box-shadow:inset 0 0 22px -16px var(--acc)}
+.card:hover,.panel:hover{border-color:var(--acc);box-shadow:0 0 16px -8px var(--acc),inset 0 0 22px -14px var(--acc)}
+.tile,.bar,.mix,#gr{border:1px solid var(--hl)}
+.eb{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);opacity:.85}.ttl{margin:2px 0 12px;font-size:19px;letter-spacing:.14em;text-transform:uppercase}
+.panel h3{text-transform:uppercase;letter-spacing:.1em}
+.gem{width:.85em;height:1.05em;vertical-align:-.17em;margin:0 .3em}.btn .pr{font-variant-numeric:tabular-nums;margin-left:.5em}.btn .pr:empty{margin:0}.btn.done .gem{display:none}
+#seq{position:fixed;inset:0;z-index:45;cursor:pointer}#seq[hidden]{display:none}
+#fl{position:fixed;inset:0;z-index:46;pointer-events:none;opacity:0;background:radial-gradient(circle,#fff,var(--acc) 40%,transparent 75%);transition:opacity .15s}#fl.on{opacity:.9}
+#crystal .crk{opacity:0;filter:drop-shadow(0 0 4px #fff)}#crystal.cr .crk{opacity:1}
+@keyframes trem{25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,-2px)}}#crystal.trem{animation:trem .12s linear infinite}
+.ach{display:flex;align-items:center;gap:10px}.an{font-size:13px;line-height:1.2}
+.mi{width:46px;height:40px;flex:none;display:grid;place-items:center;color:var(--acc)}.mi svg{width:100%;height:100%}
+.ach:not(.u) .mi{color:#2a3560}.ach:not(.u) .mi svg{width:70%;height:70%}
+.ach.u .m0 svg{filter:sepia(1) saturate(1.8) hue-rotate(-20deg) brightness(.85)}.ach.u .m1 svg{filter:grayscale(1) brightness(1.3) contrast(1.1)}
+.ach.u .m2 svg{filter:sepia(1) saturate(3) hue-rotate(160deg)}.ach.u .m3 svg{filter:sepia(1) saturate(3) hue-rotate(60deg)}
+.ach.u .m4 svg{filter:sepia(1) saturate(3) hue-rotate(250deg)}.ach.u .m5 svg{filter:sepia(1) saturate(3.5) brightness(1.2) drop-shadow(0 0 6px #ffc94a)}
+#tip{position:fixed;z-index:55;max-width:250px;background:var(--pn);border:1px solid var(--acc);border-radius:10px;padding:10px 12px;box-shadow:0 0 18px -6px var(--acc);pointer-events:none}#tip[hidden]{display:none}
+#gc{position:fixed;z-index:30;width:54px;height:66px;margin:-33px 0 0 -27px;padding:0;background:none;border:0;cursor:pointer;filter:drop-shadow(0 0 12px #ffc94a);animation:gcg 15s ease-out forwards}#gc[hidden]{display:none}
+#gc span{display:block;animation:gcb 2.6s ease-in-out infinite}#gc svg{width:100%;height:100%}
+@keyframes gcg{0%{transform:scale(.35);opacity:0}6%{opacity:1}92%{opacity:1;transform:scale(1.5)}100%{transform:scale(1.6);opacity:0}}@keyframes gcb{50%{transform:translateY(-10px)}}
+.chip{display:inline-block;position:relative;overflow:hidden;border:1px solid var(--hl);border-radius:8px;padding:6px 12px;margin:4px;background:var(--pn);font-size:13px}.chip i{position:absolute;left:0;bottom:0;height:3px;background:#ffd76a}#bfs{text-align:center;min-height:4px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--pn);border:1px solid var(--acc);border-radius:8px;padding:10px 16px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:60}#toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body>
+<div id="stars"></div><canvas id="aur"></canvas>
+<header><div><b>COSMIC CLICKER</b><div class="mut" style="font-size:11px;letter-spacing:.1em">Harvest the stars. Build beyond them.</div></div><div><div class="big" id="st">0</div><div class="mut">Space Stones</div></div><div><div class="big" id="ps">0</div><div class="mut">Production / sec</div></div><div class="mut">v6.0</div></header>
+<nav id="nv"></nav><div id="td" class="mut" style="padding:0 20px"></div>
+<main>
+<section class="pg on" id="t1"><div class="eb">Operations console</div><h2 class="ttl">The Prism Core</h2>
+<div id="scene"><div id="aura"></div><div id="rings"></div><div id="ringsF"></div>
+<svg id="crystal" overflow="visible" viewBox="0 0 240 240" role="img" aria-label="A glowing custom-drawn cyan and violet crystal">
+       <defs><linearGradient id="crystalMain" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e2ffff"/><stop offset=".3" stop-color="#6cefff"/><stop offset=".66" stop-color="#766dff"/><stop offset="1" stop-color="#2d275f"/></linearGradient><linearGradient id="crystalSide" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a2ffff"/><stop offset="1" stop-color="#6c59cb"/></linearGradient><linearGradient id="crystalDark" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#6b7cff"/><stop offset="1" stop-color="#24244d"/></linearGradient></defs>
+       <g class="crystal-float"><path d="M120 17 161 51 190 105 168 176 120 220 72 176 50 105 79 51Z" fill="#6e8aff" opacity=".14" style="stroke:var(--acc)" stroke-width="1.5"/><path d="M120 17 161 51 145 91 120 80 95 91 79 51Z" fill="url(#crystalMain)" style="stroke:var(--acc)" stroke-width="1.5"/><path d="M79 51 95 91 50 105Z" fill="#72eaff" style="stroke:var(--acc)" stroke-width="1.2"/><path d="M161 51 145 91 190 105Z" fill="#9a8cff" style="stroke:var(--acc2)" stroke-width="1.2"/><path d="M50 105 95 91 120 80 120 151 72 176Z" fill="url(#crystalSide)" style="stroke:var(--acc)" stroke-width="1.3"/><path d="M190 105 145 91 120 80 120 151 168 176Z" fill="url(#crystalDark)" style="stroke:var(--acc2)" stroke-width="1.3"/><path d="M72 176 120 151 168 176 120 220Z" fill="#34316f" style="stroke:var(--acc2)" stroke-width="1.4"/><path d="M95 91 120 80 120 151Z" fill="#edffff" opacity=".48"/><path d="M145 91 120 80 120 151Z" fill="#9c91ff" opacity=".55"/><path d="M120 151 120 220 168 176Z" fill="#22244c" opacity=".7"/><path d="M88 54 103 69" stroke="#fff" stroke-width="2" opacity=".75" stroke-linecap="round"/><path d="M70 106 83 115" stroke="#fff" stroke-width="1.6" opacity=".7" stroke-linecap="round"/><path d="M150 105 163 100" stroke="#e4dfff" stroke-width="1.5" opacity=".7" stroke-linecap="round"/><path class="crystal-shine" d="M120 27 127 75 120 80 113 75Z" fill="#fff" opacity=".6"/></g>
+       <g fill="#aafaff"><path d="m39 56 3 8 8 3-8 3-3 8-3-8-8-3 8-3Z"/><path d="m194 44 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/><circle cx="47" cy="157" r="2"/><circle cx="202" cy="147" r="2.4"/></g>
+      <g class="crk" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M120 19L108 77L132 110L110 158L125 216M132 110L168 132M108 77L72 96"/></g></svg></div>
+<div class="stats"><div><div class="big" id="tp">1</div><div class="mut">Yield / click</div></div><div><div class="big" id="cs">0</div><div class="mut">Cosmic Stones · transferable</div></div></div>
+<div id="bfs"></div><p class="mut" style="text-align:center">Tap the crystal or press Space.</p>
+<div class="dash"><div class="panel"><div class="eb">Telemetry / lifetime</div><h3>Captain's Log</h3><div class="tiles" id="tiles"></div></div>
+<div class="panel"><div class="eb">Orbital output</div><h3>Production Grid</h3><div class="mix" id="mix"></div><div class="mut" id="mixn" style="margin-top:6px"></div><h3>Signal History</h3><svg id="gr" viewBox="0 0 300 70" width="100%" style="display:block;background:#0a1026;border-radius:8px"></svg><div class="mut" id="grt" style="margin-top:6px"></div>
+<h3>Continuum Progress</h3><div class="mut" id="cbt"></div><div class="bar"><i id="cbf"></i></div>
+<h3>Next blueprint</h3><div class="card" id="nxt" style="margin:0"></div></div></div>
+<div class="panel" style="margin-top:14px"><div class="eb">Operations console / quick orders</div><h3>Field Orders</h3><div class="qs"><button class="btn q on" data-q="1">×1</button><button class="btn q" data-q="10">×10</button><button class="btn q" data-q="100">×100</button><button class="btn q" data-q="max">Max</button></div><div id="cmd"></div></div>
+</section>
+<section class="pg" id="t2"><div class="eb">Orbital foundry / build queue</div><h2 class="ttl">Construction Bay</h2>
+<div class="qs"><button class="btn q on" data-q="1">×1</button><button class="btn q" data-q="10">×10</button><button class="btn q" data-q="100">×100</button><button class="btn q" data-q="max">Max</button><span class="mut" style="align-self:center">Selling refunds 85%.</span></div>
+<div id="blds"></div>
+<div class="card" style="display:block"><div class="eb">Irreversible operation</div><h3 class="ttl" style="font-size:15px">Initiate Rebirth</h3><div class="mut" id="rbt"></div><div class="bar"><i id="rbf"></i></div><button class="btn" id="rbb">Rebirth locked</button></div>
+</section>
+<section class="pg" id="t3"><div class="eb">R&D division / prototype archive</div><h2 class="ttl">Research &amp; Development</h2><div id="res"></div></section>
+<section class="pg" id="t4"><div class="eb">Hall of records / permanent</div><h2 class="ttl">Commendations</h2><p id="gh" class="mut"></p><div id="gal"></div></section>
+<section class="pg" id="t5"><div class="eb">Save system / local archive</div><h2 class="ttl">Archive Control</h2>
+<div class="card" style="display:block"><b>Save</b><div class="mut">Autosaves every 10 seconds. Offline progress is capped at 8 hours.</div><p><button class="btn" id="sv">Save now</button> <button class="btn" id="ex">Export</button> <label class="btn" style="display:inline-block">Import<input id="im" type="file" accept=".json" hidden></label></p><p><button class="btn" id="qb"></button></p><p><button class="btn" id="rs">Reset everything</button> <button class="btn" id="ra">Reset achievements</button></p></div>
+</section>
+</main>
+<div id="fx"></div><div id="seq" hidden><div class="mut" style="position:absolute;bottom:24px;width:100%;text-align:center">Click to skip</div></div><div id="fl"></div><div id="tip" hidden></div><div id="toast"></div>
+<div id="map" hidden><div id="mh"><div><div class="eb">Charted worlds / permanent upgrades</div><b>PLANETARY MEMORY MAP</b></div><span class="mut">Cosmic Stones: <b id="mcs"></b></span><span class="mut">Drag to pan, scroll to zoom, or use arrow keys.</span><span style="flex:1"></span><button class="btn" id="near">Nearest affordable</button><button class="btn" id="leave">Leave map</button></div><div id="mv"><div id="world"></div></div><div id="pd"><div id="pdv"></div><div id="pdn" class="gr"></div><button class="btn" id="claim">Claim</button></div></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const SUF=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc','Ud','Dd','Td','Qad','Qid','Sxd','Spd','Ocd','Nod','Vg'];
+const fmt=n=>{if(!isFinite(n))return'∞';if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n)+'';const e=Math.floor(Math.log10(n)/3);return e>=SUF.length?n.toExponential(2):(n/Math.pow(1000,e)).toFixed(2)+SUF[e]};
+const NM=['Space Station','Mining Vessel','Lunar Mine','Planetary Colony','Stellar Extractor','Helios Needle','Void Observatory','Nebula Foundry','Quantum Spire','Stargate Array','Dark-Matter Well','Chrono Tower','Galaxy Loom','Singularity Engine','Cosmic Cathedral','Reality Forge','Multiverse Beacon','Eternity Engine','Genesis Tower','Omniversal Crown'];
+const GEM='<svg class="gem" viewBox="0 0 20 24" aria-hidden="true"><path d="M10 1 3 9l7 3z" fill="#fff" opacity=".9"/><path d="M10 1l7 8-7 3z" fill="var(--acc)"/><path d="M3 9l7 3v11z" fill="var(--acc)" opacity=".7"/><path d="M17 9l-7 3v11z" fill="#fff" opacity=".45"/></svg>',BI='<span class="lb"></span><span class="pr"></span>'+GEM,CG='<svg class="gem" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="5" fill="var(--acc2,var(--acc))"/><ellipse cx="10" cy="10" rx="9" ry="3" fill="none" stroke="var(--acc)" stroke-width="1.5" transform="rotate(-20 10 10)"/></svg>';
+const tint=s=>s.replace(/stroke="#([0-9a-fA-F]{6})"/g,(m,c)=>{const r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4),16),mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;if(!mx||d/mx<.15)return m;let q=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;q=(q*60+360)%360;return q>=150&&q<=210?'style="stroke:var(--acc)"':q>=230&&q<=300?'style="stroke:var(--acc2)"':m});
+const q2=x=>Number(x.toPrecision(2));
+const B=NM.map((n,i)=>{const c=i?q2(15*Math.pow(20,i)):15;return{n,c,p:q2(c/(75*Math.pow(1.26,i)))}});
+const RN=['Resonant Tapping','Core Overclock','Inner Fleet Tuning','Outer Fleet Tuning','Harmonic Tapping','Grid Synchrony','Deep Array Tuning','Cosmic Array Tuning','Quantum Efficiency','Stellar Logistics'];
+const RK=['tap','all','g0','g1','tap','all','g2','g3','all','all'],RB=[3e2,1e3,5e3,2e4,1e5,6e5,3e6,2e7,1e8,6e8];
+const PL=[["Luma","t",1,1,"#a38bff","#e5dcff"],["Vesper","a",5,1,"#7552be","#d5b8ff"],["Aurelia","t",2,1,"#b58c54","#ffe0a0"],["Cryon","a",8,2,"#458fb2","#b5f4ff"],["Morrow","a",10,3,"#628b71","#c6ffd6"],["Nyx","t",4,4,"#55437e","#c8b0ff"],["Solara","a",12,5,"#c27849","#ffddb1"],["Tethys","a",15,6,"#387c9e","#a8eeff"],["Orrery","a",15,7,"#9c6bb6","#f0c6ff"],["Verdance","t",8,9,"#47896e","#baffcf"],["Pulsar","t",10,11,"#b45b86","#ffc3e0"],["Umbriel","a",20,12,"#5d5caa","#c5caff"],["Kairo","a",22,14,"#ad8152","#ffe0a4"],["Eidolon","a",25,17,"#6d68c8","#d4d0ff"],["Zenith","t",15,19,"#538aa0","#baf5ff"],["Caldera","a",25,22,"#b45a47","#ffbca6"],["Mirrorglass","a",30,24,"#7085b4","#d3e2ff"],["Halcyon","t",25,27,"#5f9d91","#c3fff0"],["Parallax","a",35,30,"#8960ba","#e3c6ff"],["Redshift","a",40,33,"#b85d66","#ffc2c7"],["Aether","t",40,37,"#5d8bba","#c8edff"],["Eventide","a",45,40,"#7856a7","#e2c6ff"],["Starwell","a",50,44,"#4c91a0","#c3ffff"],["Omnia","t",60,47,"#9b79c8","#f0dcff"],["Lastlight","a",60,51,"#b78d57","#ffebba"],["Infinity","a",75,55,"#9a6dd4","#e4caff"],["First Dawn","t",100,60,"#c49b5b","#fff0b5"],["The Deep","a",90,64,"#4d6cc0","#c4d5ff"],["Paragon","a",125,68,"#ad6eaa","#ffd3f8"],["Home Beyond","a",200,73,"#9d7ae5","#f4e8ff"]];
+const PN=PL.map(p=>p[0]);
+const PAL=['#ff8a3d','#ff5fa2','#ff4d4d','#b6ff3d','#4d7bff','#d84dff','#ffe14d','#ff7be5','#7dff6b','#ffffff'];
+const rc=r=>r<=10?[PAL[r-1],PAL[r-1]]:[PAL[r-11],PAL[(r-8)%10]];
+const KEY='cosmicClicker_v5';
+const newRun=()=>({stones:0,earned:0,own:Array(20).fill(0),rs:Array(10).fill(0),hist:[],hn:0,bf:[]});
+const fresh=()=>({v:5,run:newRun(),perm:{cs:0,rb:0,pl:[],pend:false},life:{taps:0,earned:0,ach:{},peak:Array(20).fill(0),unseen:0},t:Date.now()});
+let VR=0,raf2=0,seq=null,S,M,Q=1,last=Date.now(),lastSave=0,tab=1,rows=[],pops=0,tt,ct=0;
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===5&&s.run&&s.perm&&s.life)return s}catch(e){}return fresh()}
+function save(){S.t=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}lastSave=S.t}
+function recalc(){M={tap:1,all:1,g:[1,1,1,1]};S.run.rs.forEach((st,i)=>{const k=RK[i];if(k==='tap')M.tap*=Math.pow(2,st);else if(k==='all')M.all*=Math.pow(1.1,st);else M.g[+k[1]]*=Math.pow(1.3,st)});let f=0;S.perm.pl.forEach(i=>{const p=PL[i];if(p[1]==='t')f+=p[2];else M.all*=1+p[2]/100});M.tap*=1+f}
+const BFX=[{n:'Prism Surge',d:'All production ×7',k:'all',v:7},{n:'Solar Flare',d:'All production ×5',k:'all',v:5},{n:'Resonant Frenzy',d:'Each tap pays 3 seconds of income',k:'tpay',v:3},{n:'Tap Typhoon',d:'Tap power ×25',k:'tap',v:25},{n:'Fleet Overdrive',d:'A random building ×15',k:'rand',v:15},{n:'Station Rush',d:'Space Stations ×50',k:'tier',t:0,v:50},{n:'Mining Bonanza',d:'Mining Vessels ×30',k:'tier',t:1,v:30},{n:'Colony Boom',d:'Planetary Colonies ×20',k:'tier',t:3,v:20},{n:'Stellar Windfall',d:'Instant 3 minutes of income',k:'inst',v:3},{n:'Bargain Beacon',d:'Building prices −25%',k:'disc',v:.75},{n:'Research Rush',d:'Research costs −50%',k:'rm',v:.5}];
+const act=()=>S.run.bf||[],bm=k=>act().reduce((a,b)=>BFX[b.i].k===k?a*BFX[b.i].v:a,1),bsum=k=>act().reduce((a,b)=>BFX[b.i].k===k?a+BFX[b.i].v:a,0),tm=i=>act().reduce((a,b)=>{const x=BFX[b.i];return(x.k==='tier'&&x.t===i)||(x.k==='rand'&&b.t===i)?a*x.v:a},1);
+const unl=i=>i<5||S.perm.rb>=i-4;
+const perSec=()=>B.reduce((a,b,i)=>a+S.run.own[i]*b.p*M.all*M.g[i/5|0]*tm(i),0)*bm('all');
+const setB=(b,l,p)=>{b.children[0].textContent=l;b.children[1].textContent=p};
+const sellVal=(i,n)=>{const o=S.run.own[i];return Math.floor(.85*B[i].c*Math.pow(1.1,o-n)*(Math.pow(1.1,n)-1)/.1)};
+const cost=(i,n)=>Math.ceil(B[i].c*Math.pow(1.1,S.run.own[i])*(Math.pow(1.1,n)-1)/.1*bm('disc'));
+function maxN(i){let n=Math.max(0,Math.floor(Math.log(1+S.run.stones/bm('disc')*.1/(B[i].c*Math.pow(1.1,S.run.own[i])))/Math.log(1.1)));while(n>0&&cost(i,n)>S.run.stones)n--;return n}
+const qn=i=>Q==='max'?maxN(i):Q;
+function buy(i){const n=qn(i);if(!n||cost(i,n)>S.run.stones)return;S.run.stones-=cost(i,n);S.run.own[i]+=n;S.life.peak[i]=Math.max(S.life.peak[i],S.run.own[i])}
+function sell(i){const o=S.run.own[i],n=Q==='max'?o:Math.min(Q,o);if(!n)return;S.run.stones+=Math.floor(.85*B[i].c*Math.pow(1.1,o-n)*(Math.pow(1.1,n)-1)/.1);S.run.own[i]-=n;S.life.sold=(S.life.sold||0)+n;if(n>=50&&!S.run.own[i])S.life.wipe=1}
+function rbInfo(){const k=S.perm.rb+1,mn=1e9*Math.pow(10,k-1),e=S.run.earned,f=Math.min(1,Math.max(0,(Math.log10(e+1)-Math.log10(mn))/2));return{k,mn,mx:mn*100,ok:k<=15&&e>=mn,rew:Math.round((4+k*.4)*(.6+.8*f))}}
+function rings(){const el=$('#rings'),fr=$('#ringsF'),now=Date.now()/1000;el.innerHTML=fr.innerHTML='';
+for(let r=1;r<=VR;r++){const c=rc(r);for(let k=0;k<2;k++){const j=(r-1)*2+k,p=14+(j*5.3)%22,w=62+(j%10)*4,t=`<div class="ring" style="--c:${c[0]};--d:${c[1]};width:${w}%;height:${w}%;transform:translate(-50%,-50%) rotate(${(j*37)%180}deg) scaleY(.3);clip-path:inset(CLIP)"><div class="sp" style="animation-duration:${p}s;animation-delay:-${((now+j*3)%p).toFixed(2)}s;animation-direction:${k?'reverse':'normal'}"><i class="dot"></i></div></div>`;
+el.insertAdjacentHTML('beforeend',t.replace('CLIP','0 0 50% 0'));fr.insertAdjacentHTML('beforeend',t.replace('CLIP','50% 0 0 0'))}}
+const a=VR?rc(VR):['#72f5ff','#a28bff'],s=document.documentElement.style;s.setProperty('--acc',a[0]);s.setProperty('--acc2',a[1])}
+const art=(kind,id)=> {
+const common=`<defs><linearGradient id="metal${id}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d1e5f5"/><stop offset=".35" stop-color="#6686a7"/><stop offset=".7" stop-color="#30445f"/><stop offset="1" stop-color="#18273e"/></linearGradient><linearGradient id="glass${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9effff"/><stop offset="1" stop-color="#2776a4"/></linearGradient></defs>`;
+const shapes={
+station:`<g stroke="#a4d7ed" stroke-width="1.5" stroke-linejoin="round"><path d="M28 77H77M123 77H172" stroke="#5f8cae" stroke-width="7"/><path d="M30 53 65 53 65 100 30 100Z" fill="#284a68"/><path d="M135 53 170 53 170 100 135 100Z" fill="#284a68"/><path d="M34 58H61V95H34ZM139 58H166V95H139Z" fill="#24648a"/><path d="M42 58V95M52 58V95M147 58V95M157 58V95" stroke="#8ceeff" opacity=".7"/><path d="M77 62 92 47H108L123 62V91L108 105H92L77 91Z" fill="url(#metal${id})"/><path d="M88 66H112V88H88Z" fill="#142941"/><path d="M94 69H106V84H94Z" fill="url(#glass${id})"/><path d="M100 47V31M93 31H107" stroke="#c4edff" stroke-width="3"/><circle cx="100" cy="27" r="4" fill="#8effff" stroke="#d5ffff"/></g><path d="M45 111H155" stroke="#6eefff" opacity=".45"/><circle cx="100" cy="77" r="43" fill="none" stroke="#68dff4" stroke-dasharray="3 6" opacity=".45"/>`,
+ship:`<g stroke="#b3d8f0" stroke-width="1.5" stroke-linejoin="round"><path d="M100 26 128 65 117 99 100 112 83 99 72 65Z" fill="url(#metal${id})"/><path d="M100 32 110 67 100 82 90 67Z" fill="url(#glass${id})"/><path d="M78 68 31 86 48 104 88 91ZM122 68 169 86 152 104 112 91Z" fill="#355b7e"/><path d="M39 87 55 97M161 87 145 97" stroke="#7cefff" stroke-width="3"/><path d="M91 101 100 130 109 101Z" fill="#9d8bff"/><path d="M95 107 100 125 105 107Z" fill="#bdfcff"/><path d="M86 65H114" stroke="#e5fbff"/><circle cx="100" cy="64" r="6" fill="#65eaff"/><path d="M63 120H137" stroke="#5bdfff" stroke-dasharray="3 5" opacity=".6"/></g>`,
+mine:`<g stroke="#b5d2e9" stroke-width="1.5" stroke-linejoin="round"><path d="M20 125 37 86 61 102 78 75 100 91 124 71 143 100 165 82 182 125Z" fill="#33435d"/><path d="M38 86 61 102 78 75 100 91 124 71 143 100 165 82" fill="none" stroke="#6b85a9"/><path d="M54 125V76L71 61H130L147 76V125Z" fill="url(#metal${id})"/><path d="M70 76H131V124H70Z" fill="#182c43"/><path d="M77 83H124V115H77Z" fill="#214a68"/><path d="M81 87H120V92H81ZM81 98H120V103H81ZM81 109H120V113H81Z" fill="#64dff3"/><path d="M62 61 76 45H124L138 61Z" fill="#829bb8"/><path d="M92 45V27H108V45" fill="#395a7a"/><path d="M96 28V18H104V28" fill="#a2efff"/><path d="M47 125V105H58V125M143 125V105H154V125" fill="#526d8c"/><path d="M24 132H176" stroke="#5deaff" stroke-width="3" opacity=".65"/></g>`,
+colony:`<g stroke="#b7d8ed" stroke-width="1.4" stroke-linejoin="round"><path d="M17 130H183" stroke="#5bdfff" stroke-width="2"/><path d="M34 127V91L45 80H70L81 91V127Z" fill="url(#metal${id})"/><path d="M41 95H74V119H41Z" fill="#1e5474"/><path d="M47 99H55V112H47ZM61 99H69V112H61Z" fill="#89f0ff"/><path d="M80 127V64Q100 34 120 64V127Z" fill="#4a6282"/><path d="M86 127V68Q100 49 114 68V127Z" fill="#1d5b7b"/><path d="M89 76Q100 62 111 76V103H89Z" fill="url(#glass${id})"/><path d="M89 110H111V127H89Z" fill="#a3d9ee"/><path d="M119 127V88L130 76H155L166 88V127Z" fill="url(#metal${id})"/><path d="M127 93H158V119H127Z" fill="#1a4c6a"/><path d="M132 97H140V110H132ZM145 97H153V110H145Z" fill="#83eaff"/><path d="M100 35V22M94 22H106" stroke="#d8fbff" stroke-width="3"/><circle cx="100" cy="20" r="4" fill="#8df6ff"/><path d="M25 132 35 121M175 132 165 121" stroke="#a4c7e1" stroke-width="3"/></g>`,
+extractor:`<g stroke="#b9ddf0" stroke-width="1.4" stroke-linejoin="round"><circle cx="100" cy="78" r="48" fill="none" stroke="#c0a6ff" stroke-width="7" opacity=".8"/><circle cx="100" cy="78" r="37" fill="none" stroke="#63e8ff" stroke-width="3" stroke-dasharray="5 4"/><circle cx="100" cy="78" r="24" fill="#202b50" stroke="#8e8dff" stroke-width="3"/><circle cx="100" cy="78" r="13" fill="url(#glass${id})" stroke="#e0ffff" stroke-width="2"/><path d="M100 17V39M100 117V139M39 78H17M161 78H183M57 35 72 50M128 106 143 121M57 121 72 106M128 50 143 35" stroke="#a4c9e7" stroke-width="8"/><path d="M93 77 100 62 107 77 100 94Z" fill="#f6ffff"/><path d="M100 4V19M100 137V152M5 78H20M180 78H195" stroke="#73f5ff" stroke-width="3"/><circle cx="100" cy="78" r="59" fill="none" stroke="#7eefff" stroke-dasharray="2 7" opacity=".65"/></g>`};
+
+if(kind.startsWith("tower")){
+ const ix=Number(kind.slice(5));
+ const designs=[
+ `<path d="M88 132 92 65 100 29 108 65 112 132Z" fill="url(#metal${id})" stroke="#bdeaff"/><path d="M96 64 100 39 104 64V111H96Z" fill="url(#glass${id})"/><path d="M73 132H127M84 88H116" stroke="#8cf5ff" stroke-width="4"/><circle cx="100" cy="29" r="7" fill="#a4ffff"/>`,
+ `<path d="M46 128V83L68 61H132L154 83V128Z" fill="url(#metal${id})" stroke="#bdeaff"/><path d="M66 80H134V115H66Z" fill="#17344d"/><path d="M74 88H88V108H74ZM94 88H108V108H94ZM114 88H128V108H114Z" fill="url(#glass${id})"/><path d="M80 61 88 38H112L120 61Z" fill="#7b8cae"/>`,
+ `<path d="M100 19 137 59 122 130H78L63 59Z" fill="url(#metal${id})" stroke="#c2b0ff" stroke-width="2"/><path d="M100 19V130M63 59H137M78 96H122" stroke="#a2f5ff" stroke-width="3"/><path d="M90 61 100 39 110 61 100 91Z" fill="url(#glass${id})"/>`,
+ `<ellipse cx="100" cy="79" rx="57" ry="28" fill="none" stroke="#9f8bff" stroke-width="9"/><ellipse cx="100" cy="79" rx="40" ry="19" fill="none" stroke="#72efff" stroke-width="3"/><path d="M100 35 119 79 100 123 81 79Z" fill="url(#metal${id})" stroke="#c5e9ff"/><circle cx="100" cy="79" r="10" fill="#eaffff"/>`,
+ `<path d="M58 130V70L76 53H124L142 70V130Z" fill="url(#metal${id})" stroke="#c0dff4"/><path d="M72 73H128V115H72Z" fill="#183d59"/><path d="M80 80H120V87H80ZM80 95H120V102H80Z" fill="url(#glass${id})"/><path d="M87 53V31H113V53Z" fill="#728eaf"/><circle cx="100" cy="29" r="6" fill="#9dffff"/>`,
+ `<circle cx="100" cy="70" r="42" fill="#17213b" stroke="#9f8cff" stroke-width="7"/><circle cx="100" cy="70" r="25" fill="none" stroke="#71efff" stroke-width="4" stroke-dasharray="5 4"/><circle cx="100" cy="70" r="12" fill="#050811"/><path d="M75 109 66 132H134L125 109Z" fill="url(#metal${id})" stroke="#bceaff"/>`,
+ `<path d="M82 132 88 62 100 25 112 62 118 132Z" fill="url(#metal${id})" stroke="#c0def2"/><circle cx="100" cy="59" r="27" fill="#17253c" stroke="#9c8bff" stroke-width="5"/><circle cx="100" cy="59" r="15" fill="none" stroke="#7bf1ff" stroke-width="3"/><path d="M100 44V59L112 66" stroke="#f1ffff" stroke-width="3"/><path d="M72 132H128" stroke="#a5a1ff" stroke-width="4"/>`,
+ `<path d="M42 126V48H58V126ZM142 126V48H158V126Z" fill="url(#metal${id})" stroke="#b8ddf1"/><path d="M50 55 150 55M50 78 150 78M50 101 150 101" stroke="#72efff" stroke-width="4"/><path d="M62 48 100 26 138 48 138 122H62Z" fill="#1d2f4a" stroke="#b7a3ff" stroke-width="2"/><path d="M71 60 129 108M129 60 71 108" stroke="#8defff" stroke-width="2"/>`,
+ `<path d="M100 20 131 52 142 88 121 130H79L58 88 69 52Z" fill="url(#metal${id})" stroke="#b8dcf0"/><circle cx="100" cy="75" r="28" fill="#14152b" stroke="#a38bff" stroke-width="6"/><circle cx="100" cy="75" r="12" fill="#03060c"/><path d="M100 47V31M100 103V125M72 75H56M128 75H144" stroke="#75edff" stroke-width="4"/>`,
+ `<path d="M37 130V79L53 62 69 79V130ZM131 130V79L147 62 163 79V130Z" fill="url(#metal${id})" stroke="#c0dff4"/><path d="M66 130V52L100 22 134 52V130Z" fill="#3b5678" stroke="#b6a1ff" stroke-width="2"/><path d="M82 130V61L100 43 118 61V130Z" fill="url(#glass${id})"/><path d="M84 84H116M84 104H116" stroke="#d4b6ff" stroke-width="4"/>`,
+ `<path d="M100 18 144 43V96L100 122 56 96V43Z" fill="url(#metal${id})" stroke="#b9a5ff" stroke-width="3"/><path d="M100 18V122M56 43 144 96M144 43 56 96" stroke="#76efff" stroke-width="2"/><path d="M100 43 121 55V81L100 94 79 81V55Z" fill="url(#glass${id})"/>`,
+ `<path d="M84 130 91 68H109L116 130Z" fill="url(#metal${id})" stroke="#c3def1"/><path d="M76 68 100 26 124 68Z" fill="#4d6b8d" stroke="#c4dff2"/><circle cx="100" cy="47" r="11" fill="url(#glass${id})"/><path d="M100 35V14M88 21 100 9 112 21M60 51Q100 13 140 51" fill="none" stroke="#7defff" stroke-width="3"/><path d="M70 103H130" stroke="#c0a6ff" stroke-width="4"/>`,
+ `<circle cx="100" cy="72" r="45" fill="none" stroke="#a28bff" stroke-width="7"/><circle cx="100" cy="72" r="29" fill="none" stroke="#73efff" stroke-width="3"/><path d="M100 27 113 58 145 72 113 86 100 117 87 86 55 72 87 58Z" fill="url(#metal${id})" stroke="#c2dff2"/><circle cx="100" cy="72" r="12" fill="url(#glass${id})"/>`,
+ `<path d="M100 17 132 57 120 130H80L68 57Z" fill="url(#metal${id})" stroke="#c0dff4"/><path d="M100 17V130M68 57H132M80 92H120" stroke="#a18cff" stroke-width="3"/><path d="M90 65 100 42 110 65 100 92Z" fill="url(#glass${id})"/><circle cx="100" cy="17" r="5" fill="#eaffff"/>`,
+ `<path d="M35 122 45 50 76 82 100 24 124 82 155 50 165 122Z" fill="url(#metal${id})" stroke="#c2a4ff" stroke-width="3"/><path d="M51 110 58 70 79 93 100 44 121 93 142 70 149 110Z" fill="#1a3b59"/><path d="M65 107 72 88 86 101 100 69 114 101 128 88 135 107Z" fill="url(#glass${id})"/><circle cx="100" cy="24" r="8" fill="#eaffff"/>`
+ ];
+ const ix2=Math.max(0,Math.min(designs.length-1,ix-6));
+ return `<svg viewBox="0 0 200 160" role="img" aria-label="Custom vector tower ${ix}">${common}<g stroke-linejoin="round" stroke-linecap="round">${designs[ix2]}<path d="M24 137H176" stroke="#6cefff" stroke-width="2" opacity=".65"/></g></svg>`;
+}
+
+return `<svg viewBox="0 0 200 160" role="img" aria-label="${kind} facility illustration">${common}<g>${shapes[kind]||shapes.station}</g></svg>`;
+};
+const AK=['station','ship','mine','colony','extractor'];
+function ico(i,l,x){return`<div class="ic${l?' sil':''}">${tint(art(i<5?AK[i]:'tower'+(i+1),(x||'m')+i))}</div>`}
+function buildRows(){const el=$('#blds');el.innerHTML='';rows=B.map((b,i)=>{const l=!unl(i),d=document.createElement('div');d.className='card'+(l?' lock':'');
+d.innerHTML=l?`${ico(i,1)}<div class="gr"><b>???</b><div class="mut">Blueprint Locked. Reach Rebirth ${i-4} to Unlock</div></div>`:`${ico(i)}<div class="gr"><b>${b.n}</b> <span class="mut">Tier ${i+1}</span><div class="mut">+${fmt(b.p)}/s each, <span class="own"></span> owned</div></div><div class="ac"><button class="btn by">${BI}</button><button class="btn sl">${BI}</button></div>`;
+el.appendChild(d);if(!l){d.querySelector('.by').onclick=()=>{buy(i);ui()};d.querySelector('.sl').onclick=()=>{sell(i);ui()}}
+return{l,own:d.querySelector('.own'),by:d.querySelector('.by'),sl:d.querySelector('.sl')}})}
+function buildRes(){$('#res').innerHTML=RN.map((n,i)=>`<div class="card rsr"><div class="gr"><b>${n}</b><div class="mut">${RK[i]==='tap'?'Tap power ×2':RK[i]==='all'?'All production ×1.1':'Tiers '+(+RK[i][1]*5+1)+' to '+(+RK[i][1]*5+5)+' ×1.3'} per stage, <span class="rst"></span></div></div><div class="ac"><button class="btn" data-i="${i}">${BI}</button></div></div>`).join('');
+$$('.rsr button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,r=S.run,c=RB[i]*Math.pow(60,r.rs[i])*bm('rm');if(r.rs[i]<4&&c<=r.stones){r.stones-=c;r.rs[i]++;S.life.rs=(S.life.rs||0)+1;recalc();ui()}})}
+function ui(){const r=S.run;$('#st').textContent=fmt(r.stones);$('#ps').textContent=fmt(perSec());$('#tp').textContent=fmt(M.tap*bm('tap')+perSec()*bsum('tpay'));$('#cs').textContent=S.perm.cs;
+rows.forEach((o,i)=>{if(o.l)return;const n=qn(i),c=cost(i,Math.max(1,n));o.own.textContent=r.own[i];setB(o.by,`Purchase ${Q==='max'?(n||'Max'):Q}`,fmt(c));o.by.disabled=!n||c>r.stones;const sn=Q==='max'?r.own[i]:Math.min(Q,r.own[i]);setB(o.sl,`Sell ${sn||(Q==='max'?'Max':Q)}`,'+'+fmt(sn?sellVal(i,sn):0));o.sl.disabled=!sn});
+const I=rbInfo(),rb=$('#rbb');$('#rbt').textContent=S.perm.rb>=15?'Expedition complete.':`Run ${I.k}: rebirth from ${fmt(I.mn)} Space Stones earned, reward caps at ${fmt(I.mx)}. Earned so far: ${fmt(r.earned)}.`;
+$('#rbf').style.width=Math.min(100,Math.log10(r.earned+1)/Math.log10(I.mn)*100)+'%';rb.disabled=!I.ok;rb.classList.toggle('pulse',I.ok);if(!rb.dataset.arm)rb.textContent=I.ok?`Rebirth for ${I.rew} Cosmic Stones`:'Rebirth locked';
+$$('.rsr').forEach((e,i)=>{const st=r.rs[i],c=RB[i]*Math.pow(60,st)*bm('rm'),b=e.querySelector('button');e.querySelector('.rst').textContent=`stage ${st} of 4`;setB(b,st>=4?'Complete':'Fund stage',st>=4?'':fmt(c));b.classList.toggle('done',st>=4);b.disabled=st>=4||c>r.stones});if(tab===1)dash()}
+const TL=[['Earned this run',()=>fmt(S.run.earned)],['Lifetime earned',()=>fmt(S.life.earned)],['Manual taps',()=>fmt(S.life.taps)],['Structures online',()=>fmt(S.run.own.reduce((a,b)=>a+b,0))],['Rebirths',()=>S.perm.rb+' of 15'],['Blueprints unlocked',()=>B.filter((b,i)=>unl(i)).length+' of 20'],['Achievements',()=>Object.keys(S.life.ach).length+' of '+AC.length],['Planets claimed',()=>S.perm.pl.length+' of '+PN.length],['Golden crystals caught',()=>S.life.gc||0],['Buffs active',()=>act().length]];
+let nxtN=-2;
+function buildDash(){$('#tiles').innerHTML=TL.map(t=>`<div class="tile"><b></b><span class="mut">${t[0]}</span></div>`).join('');nxtN=-2}
+let cmd=[],lastHN=-1;
+function buildCmd(){const el=$('#cmd');el.innerHTML='';cmd=[];B.forEach((b,i)=>{if(!unl(i))return;const d=document.createElement('div');d.className='card';d.innerHTML=`${ico(i,0,'c')}<div class="gr"><b>${b.n}</b><div class="mut"><span class="co"></span> owned, +${fmt(b.p)}/s each</div></div><button class="btn by">${BI}</button>`;el.appendChild(d);d.querySelector('.by').onclick=()=>{buy(i);ui()};cmd.push({i,co:d.querySelector('.co'),by:d.querySelector('.by')})})}
+function dash(){cmd.forEach(o=>{const i=o.i,n=qn(i),c=cost(i,Math.max(1,n));o.co.textContent=S.run.own[i];setB(o.by,`Purchase ${Q==='max'?(n||'Max'):Q}`,fmt(c));o.by.disabled=!n||c>S.run.stones});
+const H=S.run.hist||[],hn=S.run.hn||0;if(hn!==lastHN){lastHN=hn;const mx=Math.max(1,...H.map(v=>Math.log10(v+1)));$('#gr').innerHTML=H.length>1?`<polyline fill="none" stroke="var(--acc)" stroke-width="2" points="${H.map((v,k)=>(k/(H.length-1)*296+2).toFixed(1)+','+(66-Math.log10(v+1)/mx*60).toFixed(1)).join(' ')}"/>`:'';$('#grt').textContent=H.length>1?`Last ${Math.round(H.length/3)} min of this run, log scale. Peak ${fmt(Math.max(...H))}/s.`:'Collecting data. Check back in a minute.'}
+$$('#tiles .tile b').forEach((e,i)=>e.textContent=TL[i][1]());const r=S.run,tot=perSec(),parts=B.map((b,i)=>r.own[i]*b.p*M.all*M.g[i/5|0]*tm(i)*bm('all'));
+$('#mix').innerHTML=tot>0?parts.map((v,i)=>v>0?`<i style="width:${v/tot*100}%;background:hsl(${(i*47+200)%360} 70% 55%)" title="${B[i].n}: ${(v/tot*100).toFixed(1)}%"></i>`:'').join(''):'';
+const top=parts.indexOf(Math.max(...parts));$('#mixn').textContent=tot>0?`${B[top].n} leads with ${(parts[top]/tot*100).toFixed(0)}% of ${fmt(tot)} Space Stones per second.`:'Buy a Space Station to start automatic income.';
+const I=rbInfo();$('#cbt').textContent=S.perm.rb>=15?'Expedition complete.':`${fmt(r.earned)} of ${fmt(I.mn)} Space Stones earned to unlock rebirth.`;$('#cbf').style.width=Math.min(100,Math.log10(r.earned+1)/Math.log10(I.mn)*100)+'%';
+const n=B.findIndex((b,i)=>!unl(i));if(n!==nxtN){nxtN=n;$('#nxt').innerHTML=n<0?'<div class="mut">All blueprints unlocked.</div>':`${ico(n,1)}<div class="gr"><b>???</b><div class="mut">Blueprint Locked. Reach Rebirth ${n-4} to Unlock</div></div>`}}
+const BTH=[1,10,25,50,100,250],BTT=['Dockside Dawn|Orbital Neighborhood|Hub of the Void|Ring of Light|Station Sprawl|The Great Wheel','Maiden Haul|Prospector Pack|Drift Fleet|Asteroid Armada|Belt Barons|Ore Without End','First Shaft|Moondust Crew|Deep Tunnels|Crater Syndicate|Hollow Moon|Selene\'s Heart','Flag Planted|Quiet Settlement|Frontier Towns|Sprawling Cities|Planet-Wide Hum|World Without Dark','First Siphon|Solar Tap|Star Drinkers|Corona Harvest|Eclipse Engines|Sun Eaters','Needle Threaded|Spire Cluster|Sunward Lances|Forest of Light|Needlepoint Empire|Helios Unbound','First Gaze|Watchers Gather|Eyes on Nothing|Void Gazers|Argus Array|The Unblinking Eye','First Pour|Cloudforge|Stardust Smiths|Molten Mists|Foundry Fleet|Nebula Anvil','Entangled|Superposition|Quantum Quorum|Uncertain Heights|Spire Choir|Probability Crown','First Ring|Gateway Habit|Portal Network|Doorways Everywhere|Gate Garden|Threshold Lords','Gravity Bites|Shadow Wells|Heavy Silence|Unseen Fortune|Well of Wells|Golden Abyss','First Tick|Borrowed Hours|Clockwork Skyline|Time Merchants|Tower of Ages|Master of Moments','First Thread|Spinning Arms|Spiral Weavers|Cosmic Tapestry|Loomsmith Legion|Weaver of Worlds','Pinpoint Power|Event Horizon|Infinite Density|Point of No Return|Engine Choir|Heart of Darkness','First Hymn|Choir of Stars|Nave of Nebulae|Stained-Glass Sky|Cathedral Cluster|Church of Everything','Hammer Falls|Bent Rules|Law Smiths|Forged Facts|Anvil of Truth|Reality Reshaped','First Signal|Neighboring Echoes|Lighthouse Lines|Branching Brilliance|Beacon Web|Every Other Where','First Forever|Endless Hum|Perpetual Motion|Timeless Throttle|Engines Unending|Never-Ending Now','Spark of Making|Seed Spire|Garden of Starts|Cradle Skyline|Creation Choir|Let There Be','Crowned|Royal Court|Dominion Ascends|Crown Jewels|Throne of Thrones|Sovereign of All'];
+const gl=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const GL={tap:gl('<path d="M12 2 4 10l8 3zM12 2l8 8-8 3zM4 10l8 3v9zM20 10l-8 3v9z"/>'),burst:gl('<path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4"/>'),coin:gl('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>'),ship:gl('<path d="M6 3l12 6-6 3-3 6z"/><path d="M14 14l6 7"/>'),flask:gl('<path d="M9 3h6M10 3v6L5 20h14L14 9V3"/>'),planet:gl('<circle cx="12" cy="12" r="6"/><ellipse cx="12" cy="12" rx="11" ry="3.5" transform="rotate(-20 12 12)"/>'),clock:gl('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),bolt:gl('<path d="M13 2 5 13h6l-1 9 8-11h-6z"/>'),lock:gl('<circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 4 3c-1 .6-1 1.5-1 2M12 18v.5"/>')};
+const AC=[];
+BTT.forEach((s,i)=>s.split('|').forEach((n,k)=>{const t=BTH[k],b=B[i];AC.push({id:`b${i}_${t}`,n,m:k,b:i,d:t===1?`Build your first ${b.n}.`:`Own ${t} ${b.n} structures at once.`,f:()=>S.life.peak[i]>=t})}));
+const add=(g,ic,list,f,dd)=>list.forEach(([t,n])=>AC.push({id:g+t,n,ic,d:dd(t),f:()=>f(t)}));
+add('t','tap',[[10,'Warm Hands'],[100,'Steady Rhythm'],[1e3,'Crystal Whisperer'],[1e4,'Tireless Finger'],[1e5,'Carpal Cosmos']],t=>S.life.taps>=t,t=>`Tap the crystal ${fmt(t)} times.`);
+add('r','burst',[[1,'Shattered'],[5,'Veteran of the Void'],[10,'Cycle Master'],[15,'Expedition Complete']],t=>S.perm.rb>=t,t=>`Complete ${t} rebirth${t>1?'s':''}.`);
+add('e','coin',[[1e3,'Pocket Change'],[1e6,'Cosmic Savings'],[1e9,'Stellar Fortune'],[1e12,'Galactic Treasury'],[1e15,'Universal Reserve'],[1e18,'Beyond Counting']],t=>S.life.earned>=t,t=>`Earn ${fmt(t)} Space Stones across all your runs.`);
+add('s','ship',[[1,'Crash Land'],[100,'Fire Sale'],[1e3,'Liquidation Day'],[1e4,'Scorched Orbit']],t=>(S.life.sold||0)>=t,t=>`Sell ${fmt(t)} structure${t>1?'s':''}.`);
+add('w','ship',[[1,'Clean Slate']],t=>!!S.life.wipe,t=>'Sell every last unit of a building after owning 50 or more of it.');
+add('x','flask',[[1,'First Breakthrough'],[10,'Lab Rat'],[40,'Eureka Engine'],[100,'Mad Scientist']],t=>(S.life.rs||0)>=t,t=>`Complete ${t} research stage${t>1?'s':''}.`);
+add('p','planet',[[1,'First Footprint'],[5,'Cartographer'],[10,'Planetary Collector'],[15,'Lord of Worlds']],t=>S.perm.pl.length>=t,t=>`Claim ${t} planet${t>1?'s':''}.`);
+add('a','clock',[[3600,'Welcome Back'],[28800,'Long Voyage']],t=>(S.life.away||0)>=t,t=>`Return after being away for ${t/3600} hour${t>3600?'s':''}.`);
+add('i','bolt',[[1e3,'Trickle'],[1e6,'Stream'],[1e9,'River'],[1e12,'Torrent'],[1e15,'Flood'],[1e18,'Tsunami']],t=>(S.life.pk||0)>=t,t=>`Reach ${fmt(t)} Space Stones per second.`);
+add('g','bolt',[[1,'Lucky Strike'],[10,'Fortune Chaser'],[50,'Midas Touch']],t=>(S.life.gc||0)>=t,t=>`Catch ${t} golden crystal${t>1?'s':''}.`);
+function chkAch(q){const g=[];AC.forEach(a=>{if(!S.life.ach[a.id]&&a.f()){S.life.ach[a.id]=1;g.push(a.n)}});if(!g.length)return;const rw=Math.max(25,perSec()*180)*g.length;
+if(!q){S.run.stones+=rw;S.life.unseen+=g.length;toast(g.length>1?`${g.length} achievements unlocked (+${fmt(rw)} Space Stones)`:`Achievement: ${g[0]} (+${fmt(rw)} Space Stones)`)}nav();if(tab===4)gal()}
+const aico=(a,k)=>a.b!==undefined?tint(art(a.b<5?AK[a.b]:'tower'+(a.b+1),'g'+k)):GL[a.ic];
+function gal(){const u=AC.filter(a=>S.life.ach[a.id]).length;$('#gh').textContent=`Permanent commendations that survive every rebirth. ${u} of ${AC.length} earned. Each pays 3 minutes of income when first unlocked.`;
+$('#gal').innerHTML=AC.map((a,k)=>{const o=S.life.ach[a.id];return`<button class="ach${o?' u':''}" data-k="${k}"><span class="mi ${a.b!==undefined?'m'+a.m:'gl'}">${o?aico(a,k):GL.lock}</span><span class="an">${o?a.n:'???'}</span></button>`}).join('');S.life.unseen=0;nav()}
+const tip=$('#tip');let pin=-1;
+function showTip(b){const a=AC[+b.dataset.k],o=S.life.ach[a.id];tip.innerHTML=o?`<b>${a.n}</b><div class="mut">${a.d}</div><div class="mut" style="margin-top:6px">Reward collected: 3 minutes of income</div>`:'<b>???</b><div class="mut">Locked. Keep playing to discover it.</div>';tip.hidden=false;
+const r=b.getBoundingClientRect(),w=tip.offsetWidth,hh=tip.offsetHeight;let x=innerWidth-r.right>w+16?r.right+8:r.left-w-8;if(x<8)x=Math.max(8,Math.min(innerWidth-w-8,r.left));tip.style.left=x+'px';tip.style.top=Math.max(8,Math.min(innerHeight-hh-8,r.top+r.height/2-hh/2))+'px'}
+const G=$('#gal');['mouseover','focusin'].forEach(v=>G.addEventListener(v,e=>{const b=e.target.closest('.ach');if(b&&pin<0)showTip(b)}));
+['mouseout','focusout'].forEach(v=>G.addEventListener(v,e=>{if(pin<0&&e.target.closest('.ach'))tip.hidden=true}));
+G.addEventListener('click',e=>{const b=e.target.closest('.ach');if(!b)return;const k=+b.dataset.k;if(pin===k){pin=-1;tip.hidden=true}else{pin=k;showTip(b)}});
+document.addEventListener('click',e=>{if(pin>=0&&!e.target.closest('.ach')){pin=-1;tip.hidden=true}});
+function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),2600)}
+const TD=['Tap the crystal, track your empire and place quick orders.','Buy and sell structures that mine stones for you. Rebirth once you reach the minimum.','Fund upgrades that boost taps and production. Research resets on rebirth.','Your achievements. They are permanent and survive every rebirth.','Save, export, import or reset your game.'];
+function nav(){$('#td').textContent=TD[tab-1];$('#nv').innerHTML=['Command','Construction','Research','Gallery','Archives'].map((n,i)=>`<button data-t="${i+1}" class="${tab===i+1?'on':''}">0${i+1} ${n}${i===3&&S.life.unseen?' ●':''}${i===0&&gcEl?' <span style="color:#ffd76a">◆</span>':''}</button>`).join('');
+$$('#nv button').forEach(b=>b.onclick=()=>{tab=+b.dataset.t;tip.hidden=true;pin=-1;$$('.pg').forEach(p=>p.classList.toggle('on',p.id==='t'+tab));if(tab===4)gal();nav()})}
+function tap(x,y){const g=M.tap*bm('tap')+perSec()*bsum('tpay'),r=S.run;r.stones+=g;r.earned+=g;S.life.earned+=g;S.life.taps++;if(pops<14){pops++;const d=document.createElement('div');d.className='pop';d.textContent='+'+fmt(g);d.style.left=x+(Math.random()*30-15)+'px';d.style.top=y-14+'px';d.onanimationend=()=>{d.remove();pops--};$('#fx').appendChild(d)}}
+function arm(b,fn,txt){b.onclick=()=>{if(b.dataset.arm){clearTimeout(+b.dataset.arm);delete b.dataset.arm;b.textContent=b.dataset.t0;fn()}else{b.dataset.t0=b.textContent;b.textContent=txt;b.dataset.arm=setTimeout(()=>{delete b.dataset.arm;b.textContent=b.dataset.t0},3000)}}}
+function goTab(n){tab=n;$$('.pg').forEach(p=>p.classList.toggle('on',p.id==='t'+n));nav()}
+function spin(ms){const t0=performance.now(),as=$$('.sp').map(e=>e.getAnimations()[0]).filter(Boolean);(function f(){const k=Math.min(1,(performance.now()-t0)/ms);as.forEach(a=>a.updatePlaybackRate(1+14*k*k));if(k<1&&seq)raf2=requestAnimationFrame(f)})()}
+function doRebirth(){const I=rbInfo();if(!I.ok||seq)return;if(gcEl)gcGone();S.perm.cs+=I.rew;S.perm.rb++;S.perm.pend=true;S.run=newRun();recalc();save();goTab(1);
+const c=$('#crystal'),T=[],at=(f,ms)=>T.push(setTimeout(f,ms)),q=still?.25:1;let done=0;$('#seq').hidden=false;if(!still){c.classList.add('trem');spin(2400)}
+const fin=()=>{if(done)return;done=1;T.forEach(clearTimeout);cancelAnimationFrame(raf2);c.classList.remove('trem','cr','shat');c.classList.add('re');setTimeout(()=>c.classList.remove('re'),600);$('#fl').classList.remove('on');$('#seq').hidden=true;seq=null;VR=S.perm.rb;rings();buildRows();buildCmd();buildRes();ui();openMap()};
+seq=fin;at(()=>c.classList.add('cr'),2400*q);at(()=>{c.classList.add('shat');$('#fl').classList.add('on')},3000*q);at(()=>$('#fl').classList.remove('on'),3500*q);at(fin,4300*q)}
+let built=0,sel=0,sz=1,px=0,py=0,vx=0,vy=0,drag=null,moved=0,raf=0;
+const ZR=[1,3,5,8,11,14],vis=i=>S.perm.rb>=ZR[i/5|0];
+const rnd=n=>{const x=Math.sin(n*127.1)*43758.5453;return x-Math.floor(x)};
+const PX=PL.map((p,i)=>[200+(i/5|0)*430+rnd(i+1)*260,170+(i%5)*300+rnd(i+50)*140]);
+const planet=(i,s)=>`<div class="pm p${(i*7)%10}" style="--a:${PL[i][4]};--b:${PL[i][5]};--s:${s||48+(i*13)%5*9}px"></div>`;
+function applyP(){const v=$('#mv');px=Math.min(0,Math.max(v.clientWidth-2650*sz,px));py=Math.min(0,Math.max(v.clientHeight-1700*sz,py));$('#world').style.transform=`translate3d(${px}px,${py}px,0) scale(${sz})`}
+function center(i){const v=$('#mv');px=v.clientWidth/2-PX[i][0]*sz;py=v.clientHeight/2-PX[i][1]*sz;applyP()}
+const free=i=>!S.perm.pl.includes(i);
+function openMap(){$('#map').hidden=false;if(!built){built=1;$('#world').innerHTML=`<svg width="2650" height="1700" style="position:absolute;inset:0"><polyline points="${PX.map(p=>p.join(',')).join(' ')}" fill="none" style="stroke:var(--acc);stroke-opacity:.3" stroke-dasharray="4 10" stroke-width="2"/></svg>`+PL.map((p,i)=>`<button class="node" data-i="${i}" style="left:${PX[i][0]}px;top:${PX[i][1]}px">${planet(i)}<span class="nm"></span></button>`).join('');
+$$('.node').forEach(n=>n.onclick=()=>{if(moved>5)return;sel=+n.dataset.i;mapUI()})}
+let f=PL.findIndex((p,i)=>free(i)&&vis(i)&&S.perm.cs>=p[3]);if(f<0)f=Math.max(0,PL.findIndex((p,i)=>free(i)&&vis(i)));sel=f;mapUI();center(sel)}
+function mapUI(){$('#mcs').textContent=S.perm.cs;$$('.node').forEach(n=>{const i=+n.dataset.i,c=!free(i),v=vis(i);n.classList.toggle('cl',c&&v);n.classList.toggle('af',v&&!c&&S.perm.cs>=PL[i][3]);n.classList.toggle('sel',i===sel);n.querySelector('.pm').classList.toggle('fog',!v);n.querySelector('.nm').textContent=v?PL[i][0]:'???'});
+const p=PL[sel],c=!free(sel),v=vis(sel);$('#pdv').innerHTML=planet(sel,56);$('#pdv').firstChild.classList.toggle('fog',!v);$('#pdn').innerHTML=v?`<b>${p[0]}</b><div class="mut">${p[1]==='t'?'Tap power +'+p[2]:'All production +'+p[2]+'%'}</div>`:`<b>???</b><div class="mut">Unexplored. Reach Rebirth ${ZR[sel/5|0]} to discover it.</div>`;
+const b=$('#claim');b.innerHTML=!v?'Unexplored':c?'Claimed':`Claim ${p[3]}${CG}`;b.disabled=!v||c||S.perm.cs<p[3]}
+$('#claim').onclick=()=>{const p=PL[sel];if(!free(sel)||!vis(sel)||S.perm.cs<p[3])return;S.perm.cs-=p[3];S.perm.pl.push(sel);recalc();save();mapUI();ui()};
+$('#near').onclick=()=>{const v=$('#mv'),cx=(v.clientWidth/2-px)/sz,cy=(v.clientHeight/2-py)/sz;let b=-1,d=1e9;PL.forEach((p,i)=>{if(free(i)&&vis(i)&&S.perm.cs>=p[3]){const k=Math.hypot(PX[i][0]-cx,PX[i][1]-cy);if(k<d){d=k;b=i}}});if(b<0)return toast('No planet affordable yet');sel=b;mapUI();center(b)};
+const mv=$('#mv');
+mv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};moved=0;vx=vy=0;cancelAnimationFrame(raf);mv.classList.add('dr')});
+addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);vx=dx;vy=dy;px+=dx;py+=dy;applyP()});
+addEventListener('pointerup',()=>{if(!drag)return;drag=null;mv.classList.remove('dr');(function g(){vx*=.93;vy*=.93;px+=vx;py+=vy;applyP();if(Math.abs(vx)+Math.abs(vy)>.5)raf=requestAnimationFrame(g)})()});
+mv.addEventListener('wheel',e=>{e.preventDefault();const r=mv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,ns=Math.min(1.5,Math.max(.5,sz*(e.deltaY<0?1.1:.9)));px=mx-(mx-px)*ns/sz;py=my-(my-py)*ns/sz;sz=ns;applyP()},{passive:false});
+addEventListener('keydown',e=>{if($('#map').hidden)return;const k=e.key,d={ArrowLeft:[80,0],ArrowRight:[-80,0],ArrowUp:[0,80],ArrowDown:[0,-80]}[k];if(d){e.preventDefault();px+=d[0];py+=d[1];applyP()}else if(k==='+'||k==='='){sz=Math.min(1.5,sz*1.1);applyP()}else if(k==='-'){sz=Math.max(.5,sz/1.1);applyP()}else if(k==='Enter'&&e.target.tagName!=='BUTTON')$('#claim').click()});
+function applyQ(){document.body.classList.toggle('lq',S.q==='low');$('#qb').textContent='Graphics: '+(S.q==='low'?'Low':'High')}
+function init(){VR=S.perm.rb;recalc();applyQ();buildDash();rings();buildRows();buildCmd();buildRes();nav();ui();if(S.perm.pend)openMap()}
+let gcEl=null,gcT=420+Math.random()*240,gcLife=0;
+const GOLD='<svg viewBox="0 0 20 24" aria-hidden="true"><defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset="1" stop-color="#e0a020"/></linearGradient></defs><path d="M10 1 3 9l7 3z" fill="#fff6c8"/><path d="M10 1l7 8-7 3z" fill="url(#gg)"/><path d="M3 9l7 3v11z" fill="#e8b030"/><path d="M17 9l-7 3v11z" fill="#ffe27a"/></svg>';
+function gcTick(d){const bf=act();bf.forEach(b=>b.left-=d);S.run.bf=bf.filter(b=>b.left>0);
+if(gcEl){gcLife-=d;gcEl.hidden=tab!==1||!$('#map').hidden||!!seq;if(gcLife<=0)gcGone()}else if(tab===1&&!document.hidden&&$('#map').hidden&&!seq){gcT-=d;if(gcT<=0)gcSpawn()}}
+function gcSpawn(){const e=document.createElement('button');e.id='gc';e.setAttribute('aria-label','Golden crystal. Activate for a buff.');e.innerHTML='<span>'+GOLD+'</span>';e.style.left=(8+Math.random()*80)+'vw';e.style.top=(24+Math.random()*58)+'vh';e.onclick=gcClick;document.body.appendChild(e);gcEl=e;gcLife=15;nav()}
+function gcGone(){if(gcEl)gcEl.remove();gcEl=null;gcT=420+Math.random()*240;nav()}
+function gcClick(){let i,x;for(let k=0;k<6;k++){i=Math.floor(Math.random()*BFX.length);x=BFX[i];if(!(x.k==='tier'&&!S.run.own[x.t]))break}
+S.life.gc=(S.life.gc||0)+1;gcGone();
+if(x.k==='inst'){const v=Math.max(25,perSec()*x.v*60);S.run.stones+=v;toast(`${x.n}: +${fmt(v)} Space Stones`);ui();return}
+let t;if(x.k==='rand'){const c=B.map((b,j)=>j).filter(j=>unl(j)&&S.run.own[j]>0),pl=c.length?c:[0];t=pl[Math.floor(Math.random()*pl.length)]}
+const bf=S.run.bf||(S.run.bf=[]),o=bf.find(b=>b.i===i);if(o){o.left=60;if(t!==undefined)o.t=t}else bf.push({i,left:60,t});
+toast(`${x.n}: ${x.d}${t!==undefined?' ('+B[t].n+')':''}`);bfUI();ui()}
+function bfUI(){$('#bfs').innerHTML=act().map(b=>{const x=BFX[b.i];return`<div class="chip"><b>${x.n}</b> <span class="mut">${x.d}${b.t!==undefined?' ('+B[b.t].n+')':''} · ${Math.ceil(b.left)}s</span><i style="width:${b.left/60*100}%"></i></div>`}).join('')}
+function tick(){const now=Date.now(),dt=Math.min((now-last)/1000,28800);last=now;gcTick(Math.min(dt,1));const hold=dt>1.5?S.run.bf:null;if(hold)S.run.bf=[];const g=perSec()*dt,r=S.run;if(hold)S.run.bf=hold;r.stones+=g;r.earned+=g;S.life.earned+=g;S.life.pk=Math.max(S.life.pk||0,perSec());if(dt>3600)S.life.away=Math.max(S.life.away||0,dt);if(++ct%10===0){chkAch();bfUI()}if(ct%200===0){const q=S.run;(q.hist=q.hist||[]).push(Math.round(perSec()*100)/100);q.hn=(q.hn||0)+1;if(q.hist.length>360)q.hist.shift()}ui();if(now-lastSave>10000)save()}
+$('#scene').addEventListener('pointerdown',e=>{tap(e.clientX,e.clientY);ui()});
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&tab===1&&$('#map').hidden&&e.target.tagName!=='BUTTON'){e.preventDefault();const r=$('#scene').getBoundingClientRect();tap(r.left+r.width/2,r.top+r.height/2);ui()}});
+$$('.q').forEach(b=>b.onclick=()=>{Q=b.dataset.q==='max'?'max':+b.dataset.q;$$('.q').forEach(x=>x.classList.toggle('on',x.dataset.q===b.dataset.q));ui()});
+arm($('#rbb'),doRebirth,'Click again: your run resets');
+arm($('#leave'),()=>{S.perm.pend=false;$('#map').hidden=true;save()},'Click again to leave. Unspent Cosmic Stones carry over.');
+$('#seq').onclick=()=>seq&&seq();
+$('#sv').onclick=()=>{save();toast('Saved')};
+$('#ex').onclick=()=>{save();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='cosmic-clicker-v5.json';a.click()};
+$('#im').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.v!==5||!s.run||!s.perm||!s.life)throw 0;Object.assign(s.life.ach,S.life.ach);S=s;last=Date.now();init();toast('Imported')}catch(x){toast('Invalid save file')}};r.readAsText(f)};
+$('#qb').onclick=()=>{S.q=S.q==='low'?'high':'low';applyQ();aurSize()};
+arm($('#rs'),()=>{localStorage.removeItem(KEY);S=fresh();last=Date.now();init();toast('Game reset')},'Click again to erase everything');
+arm($('#ra'),()=>{S.life=fresh().life;nav();toast('Achievements reset')},'Click again to erase achievements');
+addEventListener('beforeunload',save);document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
+S=load();last=S.t||Date.now();init();chkAch(1);bfUI();setInterval(tick,100);
+const cv=$('#aur'),ax=cv.getContext('2d'),still=matchMedia('(prefers-reduced-motion:reduce)').matches,a2=x=>Math.round(x*255).toString(16).padStart(2,'0');let af=0;
+function aurSize(){const d=S.q==='low'?4:2;cv.width=Math.ceil(innerWidth/d);cv.height=Math.ceil(innerHeight/d)}
+function aurora(ts){requestAnimationFrame(aurora);if(ts-af<(S.q==='low'?100:50))return;af=ts;const w=cv.width,h=cv.height,t=still?0:ts/1000,n=VR;ax.clearRect(0,0,w,h);if(!n)return;ax.globalCompositeOperation='lighter';
+for(let r=1;r<=n;r++){const c=rc(r),base=h*(.1+((r*37)%50)/100*.5),amp=h*.07,len=h*.28,al=.1+.22*r/n,g=ax.createLinearGradient(0,base-amp,0,base+amp+len),sp=.18*(1+r%3*.3);
+g.addColorStop(0,c[0]+'00');g.addColorStop(.35,c[0]+a2(al));g.addColorStop(.7,c[1]+a2(al*.6));g.addColorStop(1,c[1]+'00');ax.fillStyle=g;ax.beginPath();
+for(let k=0;k<=40;k++){const y=base+amp*Math.sin(k*.35+t*sp+r*2);k?ax.lineTo(w*k/40,y):ax.moveTo(0,y)}
+for(let k=40;k>=0;k--)ax.lineTo(w*k/40,base+amp*Math.sin(k*.35+t*sp+r*2)+len*(.6+.4*Math.sin(k*.5+t*.25+r)));ax.fill()}}
+aurSize();addEventListener('resize',aurSize);requestAnimationFrame(aurora);
+</script></body></html>
